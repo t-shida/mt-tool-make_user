@@ -8,10 +8,6 @@ use MT;
 
 my $mt = MT->instance;
 
-#my $user_name = $ARGV[0] || die "user name is required.\n";
-#my $password  = $ARGV[1] || die "password name is required.\n";
-#my $email     = $ARGV[2] || die "email is required.\n";
-
 my ( $user_name, $password, $email, $remove );
 foreach ( @ARGV ) {
     ( $user_name ) = /^-name=(.*)$/ if $_ =~ /-name/;
