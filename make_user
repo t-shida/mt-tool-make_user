@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use lib qw(lib extlib);
+use MT;
+
+my $mt = MT->instance;
+
+#my $user_name = $ARGV[0] || die "user name is required.\n";
+#my $password  = $ARGV[1] || die "password name is required.\n";
+#my $email     = $ARGV[2] || die "email is required.\n";
+
+my ( $user_name, $password, $email, $remove );
+foreach ( @ARGV ) {
+    ( $user_name ) = /^-name=(.*)$/ if $_ =~ /-name/;
+    ( $password ) = /^-password=(.*)$/ if $_ =~ /-password/;
+    ( $email ) = /^-email=(.*)$/ if $_ =~ /-email/;
+    $remove = ( $_ eq '-remove=1' ) ? 1 : 0;
+}
+
+my $user = $mt->model( 'author' )->get_by_key( { name => $user_name } );
+
+if ( $remove == 1 ) {
+    die "$user_name does not exist.\n" if ! $user->email;
+    $user->remove;
+    print "Remove user $user_name\n";
+    exit;
+}
+
+die "$user_name already exists.\n" if $user->email;
+
+$user->nickname( $user_name );
+$user->email( $email );
+$user->auth_type( 'MT' );
+$user->status( MT::Author::ACTIVE() );
+$user->set_password( $password );
+$user->is_superuser( 1 );
+$user->save or die $user->errstr . "\n";
+
+print "Created a user.\n";
